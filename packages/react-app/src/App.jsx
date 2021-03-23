@@ -8,7 +8,7 @@ import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
 import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useContractReader, useEventListener, useBalance, useExternalContractLoader } from "./hooks";
-import { Header, Account, Faucet, Ramp, Contract, GasGauge, Address, AddressInput } from "./components";
+import { Header, Account, Faucet, Ramp, Contract, GasGauge, Address, AddressInput, Clock } from "./components";
 import { Transactor } from "./helpers";
 import { formatEther, parseEther } from "@ethersproject/units";
 //import Hints from "./Hints";
@@ -158,6 +158,10 @@ function App(props) {
   const yourBalance = balance && balance.toNumber && balance.toNumber()
   const [ yourCollectibles, setYourCollectibles ] = useState()
 
+
+// @note_kp: useEffect is a react hook: https://reactjs.org/docs/hooks-effect.html
+
+
   useEffect(()=>{
     const updateYourCollectibles = async () => {
       let collectibleUpdate = []
@@ -171,7 +175,7 @@ function App(props) {
 
           const ipfsHash =  tokenURI.replace("https://ipfs.io/ipfs/","")
           console.log("ipfsHash",ipfsHash)
-
+          // @note_kp: 
           const jsonManifestBuffer = await getFromIPFS(ipfsHash)
 
           try{
@@ -270,10 +274,13 @@ function App(props) {
       {networkDisplay}
       <BrowserRouter>
 
-        <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
+        <Menu style={{ textAlign:"left" }} selectedKeys={[route]} mode="vertical">
           <Menu.Item key="/">
             <Link onClick={()=>{setRoute("/")}} to="/">YourCollectibles</Link>
           </Menu.Item>
+          <Menu.Item key="/">
+            <Link onClick={()=>{setRoute("/NewNFT")}} to="/NewNFT">NewNFT</Link>
+          </Menu.Item>          
           <Menu.Item key="/transfers">
             <Link onClick={()=>{setRoute("/transfers")}} to="/transfers">Transfers</Link>
           </Menu.Item>
@@ -438,6 +445,15 @@ function App(props) {
                 blockExplorer={blockExplorer}
               />
           </Route>
+          <Route path="/NewNFT">
+              <Contract
+                name="NewNFT"
+                signer={userProvider.getSigner()}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
+          </Route>
         </Switch>
       </BrowserRouter>
 
@@ -482,7 +498,11 @@ function App(props) {
                Support
              </Button>
            </Col>
-         </Row>
+           <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+             <Clock />
+             {/* <GasGauge2 gasPrice={gasPrice} /> */}
+           </Col>
+        </Row>
 
          <Row align="middle" gutter={[4, 4]}>
            <Col span={24}>
